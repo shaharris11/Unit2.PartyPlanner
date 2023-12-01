@@ -19,23 +19,38 @@ const addPartyForm = document.querySelector('#addParty');
 addPartyForm.addEventListener("submit", addParty);
 
 
-
-
-//create a function for the time
-//create a function for the date (look into the API)
-async function partydate () {
-    const response = await fetch (API_URL);
-    const party = await response.party.date.splice(0, 10);
-    console.log(party);
-}
-
 async function render() {
     await theParties();
     renderParties();
 }
 render();
 
+//create a function for the time
+//create a function for the date (look into the API)
 
+function partyTime(str) {
+    let time = str.slice(11, 23);
+    return time;
+}
+function partyDate(str) {
+    let date = str.slice(0, 10);
+    return date;
+}
+
+// async function getParties() {
+//     try {
+//       const response = await fetch(API_URL);
+//       const responseJson = await response.json();
+//       const changedResponse = responseJson.data.map((party) => {
+//         party.time = partyTime(party.date);
+//         party.date = partyDate(party.date);
+//         return changedResponse
+//       })
+//       return changedResponse;
+//     } catch (error) {
+//       console.error(error.message);
+//     }
+// }
 
 async function theParties () {
     try {
@@ -56,12 +71,23 @@ function renderParties () {
     
     const partyCards = state.parties.map((party) => {
         const li = document.createElement("li");
+        const formattedDate = partyDate(party.date);
+        const formattedTime = partyTime(party.date);
         li.innerHTML = `
           <h3>${party.name}</h3>
-          <h3>${party.date}</h3>
+          <h3>${formattedDate}</h3>
+          <h3>${formattedTime}</h3>
           <h3>${party.location}</h3>
           <p>${party.description}</p>
         `;
+        const deleteButton = document.createElement('button')
+        deleteButton.textContent = "Delete Party"
+        li.append(deleteButton)
+
+        deleteButton.addEventListener("click", () => deleteParties(party.id))
+
+    
+        
         return li;
       });
     
@@ -77,8 +103,8 @@ async function addParty(event) {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 name: addPartyForm.Partyname.value,
-                date:
-                location, addPartyForm,PartyLocation,value,
+                date: addPartyForm.PartyDate.value,
+                location: addPartyForm.PartyLocation.value,
                 description: addPartyForm.PartyDescription.value,
             }),
         });
@@ -90,3 +116,16 @@ async function addParty(event) {
         console.error(error);
     }
 }
+
+async function deleteParties (id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+        })
+        render ()
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+
