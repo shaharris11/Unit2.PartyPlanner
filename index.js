@@ -15,6 +15,18 @@ const state = {
 
 const partyList = document.querySelector('#allparties');
 const partyListContainer = document.querySelector('#parties');
+const addPartyForm = document.querySelector('#addParty');
+
+
+
+
+//create a function for the time
+//create a function for the date (look into the API)
+async function partydate () {
+    const response = await fetch (API_URL);
+    const party = await response.party.date.splice(0, 10);
+    
+}
 
 async function render() {
     await theParties();
@@ -27,8 +39,8 @@ render();
 async function theParties () {
     try {
         const response = await fetch (API_URL);
-        const party = await response.party ();
-        state.parties = party.data;
+        const json = await response.json();
+        state.parties = json.data;
     } catch (error) {
         console.log(error);
     }
@@ -36,22 +48,44 @@ async function theParties () {
 
 
 function renderParties () {
-    if(!partyList || partyList.length === 0) {
-        partyListContainer.innerHTML = '<h3>No parties</h3>';
+    if(!state.parties.length) {
+        partyListContainer.innerHTML = '<h2>No parties</h2>';
         return;
     }
-    partyListContainer.innerHTML = '';
-
-    partyList.forEach((party) => {
-        console.log(party);
-        const partyElement = document.createElement('div');
-        partyElement.classList.add('party-card');
-        partyElement.innerHTML = `
-            <h4>${party.name}</h4>
-            <h4>${party.date.time}</h4>
-            <h4>${party.location}</h4>
-            <p>${party.description}</p>
+    
+    const partyCards = state.parties.map((party) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <h3>${party.name}</h3>
+          <h3>${party.date}</h3>
+          <h3>${party.location}</h3>
+          <p>${party.description}</p>
         `;
-        partyListContainer.appendChild(partyElement);
-    });
+        return li;
+      });
+    
+      partyList.replaceChildren(...partyCards);
+}
+//create a function that can add and save to the website
+// async function = try/catch with method, header, body
+async function addParty(event) {
+    event.preventDefault();
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: addPartyForm.partyname.value,
+                date:
+                location, addPartyForm,PartyLocation,value,
+                description: addPartyForm.PartyDescription.value,
+            }),
+        });
+        if (!response.ok) {
+            throw new Error("Failed to create party");
+        }
+        render();
+    } catch (error) {
+        console.error(error);
+    }
 }
