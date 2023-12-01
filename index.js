@@ -16,6 +16,7 @@ const state = {
 const partyList = document.querySelector('#allparties');
 const partyListContainer = document.querySelector('#parties');
 const addPartyForm = document.querySelector('#addParty');
+addPartyForm.addEventListener("submit", addParty);
 
 
 
@@ -25,7 +26,7 @@ const addPartyForm = document.querySelector('#addParty');
 async function partydate () {
     const response = await fetch (API_URL);
     const party = await response.party.date.splice(0, 10);
-    
+    console.log(party);
 }
 
 async function render() {
@@ -75,7 +76,7 @@ async function addParty(event) {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                name: addPartyForm.partyname.value,
+                name: addPartyForm.Partyname.value,
                 date:
                 location, addPartyForm,PartyLocation,value,
                 description: addPartyForm.PartyDescription.value,
